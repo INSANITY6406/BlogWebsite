@@ -1,6 +1,7 @@
 {% extends "main/base.html" %}
 {% block title %}Home Page{% endblock title %}
 {% block content %}
+{% if perms.main.view_post %}
 {% for post in posts %}
     <div class="card mt-2">
         <div class="card-header"><strong>@{{post.author}}</strong></div>
@@ -10,13 +11,17 @@
             <p class="card-text">{{post.description}}</p>
             </div>
             <div>
-                {% if user.username == post.author %}
+                {% if user.username == post.author or perms.main.delete_post  %}
                 <form method="Post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger" name="post-id" value="{{post.id}}">Delete</button>
                 </form>
-                {% else %}
-                <p>{{user}}</p>
+                {% endif %}
+                {% if user.is_staff %}
+                    <form method="Post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark" name="userid" value="{{post.id}}">Ban</button>
+                    </form>
                 {% endif %}
             </div>
 
@@ -26,5 +31,8 @@
     {% empty %}
     <p> No Posts Yet:(</p>
 {% endfor %}
+{% else %}
+<h1> You are Banned!!</h1>
+{% endif %}
 
 {% endblock content %}
